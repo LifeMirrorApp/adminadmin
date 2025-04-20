@@ -25,6 +25,7 @@ const AddProduct = () => {
   const [selectedParentId, setSelectedParentId] = useState("");
   const [selectedChildId, setSelectedChildId] = useState("");
   const [videoOrAudioFile, setVideoOrAudioFile] = useState(null);
+  const [supportingFile, setSupportingFile] = useState(null);
 
   const [newSubCategory, setNewSubCategory] = useState("");
   const navigate = useNavigate();
@@ -209,8 +210,11 @@ const AddProduct = () => {
       productImages.forEach((image) => {
         formData.append("images", image); // Use same key 'images'
       });
-      if (videoOrAudioFile) {
-        formData.append("videoFile", videoOrAudioFile);
+      // if (videoOrAudioFile) {
+      //   formData.append("videoFile", videoOrAudioFile);
+      // }
+      if (supportingFile) {
+        formData.append("supportingFile", supportingFile);
       }
 
       const productRes = await axios.post(
@@ -394,23 +398,20 @@ const AddProduct = () => {
             />
           </div>
         )}*/}
-        {(productType === "video" ||
-          productType === "audio" ||
-          productType === "book" ||
-          productType === "course") && (
+        {["video", "audio", "book", "course"].includes(productType) && (
           <div className="mb-4">
             <label className="block text-gray-700 font-medium mb-2">
-              Upload{" "}
-              {productType.charAt(0).toUpperCase() + productType.slice(1)} File
+              Upload File
             </label>
+            {/*} <input
+              type="file"
+              onChange={(e) => setVideoOrAudioFile(e.target.files[0])}
+              className="w-full"
+            />*/}
+
             <input
               type="file"
-              accept={
-                productType === "video"
-                  ? "video/*,.pdf,.doc,.docx"
-                  : "audio/*,.pdf,.doc,.docx"
-              }
-              onChange={(e) => setVideoOrAudioFile(e.target.files[0])}
+              onChange={(e) => setSupportingFile(e.target.files[0])}
               className="w-full"
             />
           </div>

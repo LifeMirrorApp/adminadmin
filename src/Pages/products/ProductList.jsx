@@ -398,7 +398,7 @@ const ProductList = () => {
                     {product.images[0]}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {product.videoFile}
+                    {product.supportingFile}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     {product.status === "approved" ? (
