@@ -395,10 +395,10 @@ const ProductList = () => {
                     ₦{product.discountPrice?.toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {product.videoFile}
+                    {product.images[0]}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {product.image}
+                    {product.videoFile}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     {product.status === "approved" ? (
