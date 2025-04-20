@@ -11,6 +11,7 @@ import OrderList from "./Pages/Order/OrderList";
 import ProductList from "./Pages/products/ProductList";
 import ProductDetails from "./Pages/products/ProductDetails";
 import OrderDetails from "./Pages/Order/OrderDetails";
+import NewCategory from "./Pages/Skills/NewCategory";
 
 const router = createBrowserRouter([
   {
@@ -28,7 +29,10 @@ const router = createBrowserRouter([
     path: "/category",
     element: <Skills />,
   },
-
+  {
+    path: "/add-category",
+    element: <NewCategory />,
+  },
   {
     path: "/users",
     element: <Users />,
