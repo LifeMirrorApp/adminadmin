@@ -219,16 +219,88 @@ const AddProduct = () => {
   const [categoryImage, setCategoryImage] = useState(null);
   const [selectedIcon, setSelectedIcon] = useState("");
   const [subCategories, setSubCategories] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [language, setLanguage] = useState("");
   const [discountPrice, setDiscountPrice] = useState("");
+  const [categories, setCategories] = useState([]);
   const [parentCategories, setParentCategories] = useState([]);
-  const [selectedParentId, setSelectedParentId] = useState("");
   const [childCategories, setChildCategories] = useState([]);
+  const [selectedParentId, setSelectedParentId] = useState("");
   const [selectedChildId, setSelectedChildId] = useState("");
+
   const [newSubCategory, setNewSubCategory] = useState("");
   const navigate = useNavigate();
 
+  // Fetch all categories
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/categories`
+      );
+      const allCategories = res.data;
+      setCategories(allCategories);
+
+      // Parent categories are those with null or no parent
+      const parents = allCategories.filter(
+        (cat) => !cat.parent || cat.parent === null
+      );
+      setParentCategories(parents);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+    }
+  };
+
+  // Handle parent selection
+  // const handleParentChange = (e) => {
+  //   const parentId = e.target.value;
+  //   setSelectedParentId(parentId);
+  //   setSelectedChildId("");
+
+  //   const children = categories.filter((cat) => cat.parent === parentId);
+  //   setChildCategories(children);
+  // };
+  // const handleParentChange = (e) => {
+  //   const parentId = e.target.value;
+  //   setSelectedParentId(parentId);
+  //   setSelectedChildId("");
+
+  //   const children = categories.filter((cat) => {
+  //     // Normalize the parent ID
+  //     if (!cat.parent) return false;
+
+  //     const catParentId =
+  //       typeof cat.parent === "string" ? cat.parent : cat.parent._id;
+
+  //     return catParentId === parentId;
+  //   });
+  //   console.log("Parent ID:", selectedParentId);
+  //   console.log("All categories:", categories);
+  //   console.log("Filtered children:", childCategories);
+
+  //   setChildCategories(children);
+  // };
+  const handleParentChange = (e) => {
+    const parentId = e.target.value;
+    setSelectedParentId(parentId);
+    setSelectedChildId("");
+
+    const selectedParent = categories.find((cat) => cat._id === parentId);
+
+    const children =
+      selectedParent?.children?.filter((child) => {
+        // Optional: Filter out products if you only want subcategories
+        return child.name && child._id;
+      }) || [];
+
+    console.log("Parent ID:", parentId);
+    console.log("Selected Parent:", selectedParent);
+    console.log("Filtered children:", children);
+
+    setChildCategories(children);
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
   const handleAddSubCategory = () => {
     if (newSubCategory.trim() !== "") {
       setSubCategories([...subCategories, newSubCategory.trim()]);
@@ -245,29 +317,6 @@ const AddProduct = () => {
   useEffect(() => {
     fetchCategories();
   }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/category`);
-      const allCategories = res.data;
-      setCategories(allCategories);
-
-      // Group into parents
-      const parents = allCategories.filter((cat) => !cat.parent);
-      setParentCategories(parents);
-    } catch (error) {
-      console.error("Failed to fetch categories:", error);
-    }
-  };
-
-  const handleParentChange = (e) => {
-    const parentId = e.target.value;
-    setSelectedParentId(parentId);
-    setSelectedChildId("");
-
-    const children = categories.filter((cat) => cat.parent === parentId);
-    setChildCategories(children);
-  };
 
   // const handleSubmit = async () => {
   //   try {
