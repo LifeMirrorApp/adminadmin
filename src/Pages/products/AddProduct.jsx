@@ -503,9 +503,7 @@ const AddProduct = () => {
 
         {/* Parent Category */}
         <div className="mb-4">
-          <label className="block mb-1 font-medium">
-            Select Parent Category
-          </label>
+          <label className="block mb-1 font-medium">Select Category</label>
           <select
             value={selectedParentId}
             onChange={handleParentChange}
