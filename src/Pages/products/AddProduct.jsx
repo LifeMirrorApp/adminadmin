@@ -94,13 +94,13 @@ const AddProduct = () => {
       <AdminHeader />
       <div className="p-6 max-w-2xl mx-auto">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          Add New Category
+          Add New Product
         </h2>
 
         {/* Category Name */}
         <div className="mb-4">
           <label className="block text-gray-700 font-medium mb-2">
-            Category Name
+            Product Name
           </label>
           <input
             type="text"
