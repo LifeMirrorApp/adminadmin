@@ -26,6 +26,7 @@ const AddProduct = () => {
   const [selectedChildId, setSelectedChildId] = useState("");
   const [videoOrAudioFile, setVideoOrAudioFile] = useState(null);
   const [supportingFile, setSupportingFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const [newSubCategory, setNewSubCategory] = useState("");
   const navigate = useNavigate();
@@ -187,36 +188,78 @@ const AddProduct = () => {
   //   }
   // };
 
+  // const handleSubmit = async () => {
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("name", productName);
+  //     formData.append("description", productDescription);
+  //     formData.append("price", productPrice);
+  //     formData.append("discountPrice", discountPrice);
+  //     formData.append("quantityAvailable", productQuantity);
+  //     formData.append("size", productSize);
+  //     formData.append("language", language);
+  //     formData.append("isbn", productISBN);
+  //     formData.append("productType", productType);
+  //     formData.append("category", selectedChildId); // Attach child category
+  //     // if (videoOrAudioFile) {
+  //     //   formData.append("videoFile", videoOrAudioFile);
+  //     // }
+
+  //     // productImages.forEach((image, index) => {
+  //     //   formData.append(`images[${index}]`, image);
+  //     // });
+  //     productImages.forEach((image) => {
+  //       formData.append("images", image); // Use same key 'images'
+  //     });
+  //     // if (videoOrAudioFile) {
+  //     //   formData.append("videoFile", videoOrAudioFile);
+  //     // }
+  //     if (supportingFile) {
+  //       formData.append("supportingFile", supportingFile);
+  //     }
+
+  //     const productRes = await axios.post(
+  //       `${import.meta.env.VITE_BASE_URL}/create-product`,
+  //       formData
+  //     );
+
+  //     console.log("Product created:", productRes.data);
+  //     navigate("/products");
+  //   } catch (error) {
+  //     console.error("Error creating product:", error);
+  //   }
+  // };
   const handleSubmit = async () => {
+    const [loading, setLoading] = useState(false);
+
     try {
       const formData = new FormData();
-      formData.append("name", productName);
-      formData.append("description", productDescription);
-      formData.append("price", productPrice);
-      formData.append("discountPrice", discountPrice);
-      formData.append("quantityAvailable", productQuantity);
-      formData.append("size", productSize);
-      formData.append("language", language);
-      formData.append("isbn", productISBN);
-      formData.append("productType", productType);
-      formData.append("category", selectedChildId); // Attach child category
-      // if (videoOrAudioFile) {
-      //   formData.append("videoFile", videoOrAudioFile);
-      // }
 
-      // productImages.forEach((image, index) => {
-      //   formData.append(`images[${index}]`, image);
-      // });
+      // Append fields only if they are not empty
+      if (productName) formData.append("name", productName);
+      if (productDescription)
+        formData.append("description", productDescription);
+      if (productPrice) formData.append("price", productPrice);
+      if (discountPrice) formData.append("discountPrice", discountPrice);
+      if (productQuantity)
+        formData.append("quantityAvailable", productQuantity);
+      if (productSize) formData.append("size", productSize);
+      if (language) formData.append("language", language);
+      if (productISBN) formData.append("isbn", productISBN);
+      if (productType) formData.append("productType", productType);
+      if (selectedChildId) formData.append("category", selectedChildId); // Attach child category
+
+      // Images
       productImages.forEach((image) => {
-        formData.append("images", image); // Use same key 'images'
+        formData.append("images", image);
       });
-      // if (videoOrAudioFile) {
-      //   formData.append("videoFile", videoOrAudioFile);
-      // }
+
+      // Supporting file (optional)
       if (supportingFile) {
         formData.append("supportingFile", supportingFile);
       }
 
+      // Make the POST request to the server
       const productRes = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/create-product`,
         formData
@@ -226,8 +269,11 @@ const AddProduct = () => {
       navigate("/products");
     } catch (error) {
       console.error("Error creating product:", error);
+    } finally {
+      setLoading(false); // Stop loading after submission
     }
   };
+
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files); // ✅ Convert to array
     setProductImages(files);
@@ -418,12 +464,26 @@ const AddProduct = () => {
         )}
 
         {/* Submit Button */}
-        <div className="flex justify-end">
+        {/*} <div className="flex justify-end">
           <button
             onClick={handleSubmit}
             className="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700"
           >
             Submit Product
+          </button>
+        </div>*/}
+
+        <div className="flex justify-end">
+          <button
+            onClick={handleSubmit}
+            className="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700 flex items-center"
+            disabled={loading} // Disable the button while loading
+          >
+            {loading ? (
+              <div className="spinner-border animate-spin border-4 border-t-4 border-purple-700 rounded-full w-6 h-6 mr-3"></div>
+            ) : (
+              "Submit Product"
+            )}
           </button>
         </div>
       </div>
