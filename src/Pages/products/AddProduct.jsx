@@ -200,7 +200,7 @@
 // };
 
 // export default AddProduct;
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import AdminHeader from "../../Components/AdminHeader/AdminHeader";
@@ -219,6 +219,13 @@ const AddProduct = () => {
   const [categoryImage, setCategoryImage] = useState(null);
   const [selectedIcon, setSelectedIcon] = useState("");
   const [subCategories, setSubCategories] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [language, setLanguage] = useState("");
+  const [discountPrice, setDiscountPrice] = useState("");
+  const [parentCategories, setParentCategories] = useState([]);
+  const [selectedParentId, setSelectedParentId] = useState("");
+  const [childCategories, setChildCategories] = useState([]);
+  const [selectedChildId, setSelectedChildId] = useState("");
   const [newSubCategory, setNewSubCategory] = useState("");
   const navigate = useNavigate();
 
@@ -235,75 +242,131 @@ const AddProduct = () => {
     setSubCategories(updated);
   };
 
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/category`);
+      const allCategories = res.data;
+      setCategories(allCategories);
+
+      // Group into parents
+      const parents = allCategories.filter((cat) => !cat.parent);
+      setParentCategories(parents);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+    }
+  };
+
+  const handleParentChange = (e) => {
+    const parentId = e.target.value;
+    setSelectedParentId(parentId);
+    setSelectedChildId("");
+
+    const children = categories.filter((cat) => cat.parent === parentId);
+    setChildCategories(children);
+  };
+
+  // const handleSubmit = async () => {
+  //   try {
+  //     // Step 1: Create the parent category
+  //     const formData = new FormData();
+  //     formData.append("name", categoryName);
+  //     formData.append("icon", selectedIcon);
+  //     if (categoryImage) formData.append("image", categoryImage);
+
+  //     // Create the category
+  //     const parentRes = await axios.post(
+  //       `${import.meta.env.VITE_BASE_URL}/category`,
+  //       formData
+  //     );
+
+  //     const parentCategory = parentRes.data;
+
+  //     // Step 2: Create each subcategory
+  //     for (let sub of subCategories) {
+  //       const subData = new FormData();
+  //       subData.append("name", sub);
+  //       subData.append("icon", selectedIcon); // Optional: reuse or change icon
+  //       subData.append("parent", parentCategory._id);
+
+  //       await axios.post(`${import.meta.env.VITE_BASE_URL}/category`, subData);
+  //     }
+
+  //     // Step 3: Now create the product
+  //     const productFormData = new FormData();
+  //     productFormData.append("name", productName);
+  //     productFormData.append("description", productDescription);
+  //     productFormData.append("price", productPrice);
+  //     productFormData.append("category", parentCategory._id); // Attach the category to the product
+  //     productFormData.append("quantityAvailable", productQuantity);
+  //     productFormData.append("size", productSize);
+  //     productFormData.append("isbn", productISBN);
+  //     productFormData.append("productType", productType);
+  //     if (productImages.length > 0) {
+  //       productImages.forEach((image, index) => {
+  //         productFormData.append(`images[${index}]`, image);
+  //       });
+  //     }
+
+  //     const productRes = await axios.post(
+  //       `${import.meta.env.VITE_BASE_URL}/create-product`,
+  //       productFormData
+  //     );
+
+  //     console.log("Product created:", productRes.data);
+
+  //     // Reset form
+  //     setProductName("");
+  //     setProductDescription("");
+  //     setProductPrice("");
+  //     setProductCategory("");
+  //     setProductImages([]);
+  //     setProductType("");
+  //     setProductQuantity(0);
+  //     setProductSize("");
+  //     setProductISBN("");
+  //     setCategoryName("");
+  //     setCategoryImage(null);
+  //     setSelectedIcon("");
+  //     setSubCategories([]);
+  //     navigate("/products"); // Navigate back to products list
+  //   } catch (error) {
+  //     console.error("Error creating product:", error);
+  //   }
+  // };
+
   const handleSubmit = async () => {
     try {
-      // Step 1: Create the parent category
       const formData = new FormData();
-      formData.append("name", categoryName);
-      formData.append("icon", selectedIcon);
-      if (categoryImage) formData.append("image", categoryImage);
+      formData.append("name", productName);
+      formData.append("description", productDescription);
+      formData.append("price", productPrice);
+      formData.append("discountPrice", discountPrice);
+      formData.append("quantityAvailable", productQuantity);
+      formData.append("size", productSize);
+      formData.append("language", language);
+      formData.append("isbn", productISBN);
+      formData.append("productType", productType);
+      formData.append("category", selectedChildId); // Attach child category
 
-      // Create the category
-      const parentRes = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/category`,
-        formData
-      );
-
-      const parentCategory = parentRes.data;
-
-      // Step 2: Create each subcategory
-      for (let sub of subCategories) {
-        const subData = new FormData();
-        subData.append("name", sub);
-        subData.append("icon", selectedIcon); // Optional: reuse or change icon
-        subData.append("parent", parentCategory._id);
-
-        await axios.post(`${import.meta.env.VITE_BASE_URL}/category`, subData);
-      }
-
-      // Step 3: Now create the product
-      const productFormData = new FormData();
-      productFormData.append("name", productName);
-      productFormData.append("description", productDescription);
-      productFormData.append("price", productPrice);
-      productFormData.append("category", parentCategory._id); // Attach the category to the product
-      productFormData.append("quantityAvailable", productQuantity);
-      productFormData.append("size", productSize);
-      productFormData.append("isbn", productISBN);
-      productFormData.append("productType", productType);
-      if (productImages.length > 0) {
-        productImages.forEach((image, index) => {
-          productFormData.append(`images[${index}]`, image);
-        });
-      }
+      productImages.forEach((image, index) => {
+        formData.append(`images[${index}]`, image);
+      });
 
       const productRes = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/create-product`,
-        productFormData
+        formData
       );
 
       console.log("Product created:", productRes.data);
-
-      // Reset form
-      setProductName("");
-      setProductDescription("");
-      setProductPrice("");
-      setProductCategory("");
-      setProductImages([]);
-      setProductType("");
-      setProductQuantity(0);
-      setProductSize("");
-      setProductISBN("");
-      setCategoryName("");
-      setCategoryImage(null);
-      setSelectedIcon("");
-      setSubCategories([]);
-      navigate("/products"); // Navigate back to products list
+      navigate("/products");
     } catch (error) {
       console.error("Error creating product:", error);
     }
   };
-
   return (
     <>
       <AdminHeader />
@@ -340,31 +403,90 @@ const AddProduct = () => {
         </div>
 
         {/* Product Price */}
-        <div className="mb-4">
-          <label className="block text-gray-700 font-medium mb-2">
-            Product Price
-          </label>
-          <input
-            type="number"
-            value={productPrice}
-            onChange={(e) => setProductPrice(e.target.value)}
-            placeholder="Enter product price"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block mb-1 font-medium">Price</label>
+            <input
+              type="number"
+              value={productPrice}
+              onChange={(e) => setProductPrice(e.target.value)}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div>
+            <label className="block mb-1 font-medium">Discount Price</label>
+            <input
+              type="number"
+              value={discountPrice}
+              onChange={(e) => setDiscountPrice(e.target.value)}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+        </div>
+        {/* Quantity, Size, Language */}
+        <div className="grid grid-cols-3 gap-4 mb-4">
+          <div>
+            <label className="block mb-1 font-medium">Quantity</label>
+            <input
+              type="number"
+              value={productQuantity}
+              onChange={(e) => setProductQuantity(e.target.value)}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div>
+            <label className="block mb-1 font-medium">Size</label>
+            <input
+              value={productSize}
+              onChange={(e) => setProductSize(e.target.value)}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div>
+            <label className="block mb-1 font-medium">Language</label>
+            <input
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="w-full p-2 border rounded"
+            />
+          </div>
         </div>
 
-        {/* Product Images */}
+        {/* Parent Category */}
         <div className="mb-4">
-          <label className="block text-gray-700 font-medium mb-2">
-            Upload Product Images
+          <label className="block mb-1 font-medium">
+            Select Parent Category
           </label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => setProductImages(e.target.files)}
-            className="w-full"
-          />
+          <select
+            value={selectedParentId}
+            onChange={handleParentChange}
+            className="w-full p-2 border rounded"
+          >
+            <option value="">-- Select Parent --</option>
+            {parentCategories.map((cat) => (
+              <option key={cat._id} value={cat._id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Child Category */}
+        <div className="mb-4">
+          <label className="block mb-1 font-medium">Select Sub Category</label>
+          <select
+            value={selectedChildId}
+            onChange={(e) => setSelectedChildId(e.target.value)}
+            className="w-full p-2 border rounded"
+            disabled={!childCategories.length}
+          >
+            <option value="">-- Select Sub Category --</option>
+            {childCategories.map((cat) => (
+              <option key={cat._id} value={cat._id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Product Type */}
@@ -383,6 +505,19 @@ const AddProduct = () => {
             <option value="audio">Audio</option>
             <option value="course">Course</option>
           </select>
+        </div>
+        {/* Product Images */}
+        <div className="mb-4">
+          <label className="block text-gray-700 font-medium mb-2">
+            Upload Product Images
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => setProductImages(e.target.files)}
+            className="w-full"
+          />
         </div>
 
         {/* Submit Button */}
