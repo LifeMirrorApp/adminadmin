@@ -230,7 +230,7 @@ const AddProduct = () => {
   //   }
   // };
   const handleSubmit = async () => {
-    const [loading, setLoading] = useState(false);
+    setLoading(true); // Start loading before making the request
 
     try {
       const formData = new FormData();
@@ -476,14 +476,11 @@ const AddProduct = () => {
         <div className="flex justify-end">
           <button
             onClick={handleSubmit}
-            className="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700 flex items-center"
-            disabled={loading} // Disable the button while loading
+            disabled={loading}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md"
+            style={{ backgroundColor: "purple" }}
           >
-            {loading ? (
-              <div className="spinner-border animate-spin border-4 border-t-4 border-purple-700 rounded-full w-6 h-6 mr-3"></div>
-            ) : (
-              "Submit Product"
-            )}
+            {loading ? "Submitting..." : "Submit"}
           </button>
         </div>
       </div>
