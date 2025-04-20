@@ -250,7 +250,8 @@ const ProductList = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/products");
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/products`);
+
         const data = await res.json();
 
         // Log data to see what you are getting
@@ -370,9 +371,7 @@ const ProductList = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {product.productType}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {product.orderId || "N/A"}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     ₦{product.price?.toLocaleString()}
                   </td>
